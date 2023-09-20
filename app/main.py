@@ -10,6 +10,7 @@ from .proxy.ip66 import Ip66
 from .utils.request import HttpRequest
 from .notify.feishu import Feishu
 from .notify.dingtalk import Dingtalk
+from .notify.telegram import Telegram
 from .utils.helpers import die, write_file
 from .utils.domain import Domain
 from .whois.west import West
@@ -68,12 +69,16 @@ class App:
 
         default_notify_secret = {'token': '', 'secret': ''}
         default_notify = {
-            'enable': '',
+            'enable': 'telegram',
             'dingtalk': default_notify_secret,
             'feishu': default_notify_secret,
+            'telegram': default_notify_secret
         }
         self.notify = {**default_notify, **config.get('notify', {})}
-
+        notify = self.notify.get(self.notify.get('enable'))
+        token = notify.get('token')
+        secret = notify.get('secret')
+        notify.update({'token': os.getenv('NOTIFY_TOKEN', token), 'secret': os.getenv('NOTIFY_SECRET', secret)})
         # 初始化 ISP
         self.init_isp()
 
@@ -248,7 +253,7 @@ class App:
         if not self.notify['enable']:
             return
 
-        print(self.notify['enable'])
+        # print(self.notify['enable'])
         providers = str(self.notify['enable']).replace(' ', '').split(',')
 
         try:
@@ -261,6 +266,8 @@ class App:
                 elif provider == 'feishu':
                     notify = Feishu(
                         self.notify[provider]['token'], self.notify[provider]['secret'])
+                elif provider == 'telegram':
+                    notify = Telegram(self.notify[provider]['token'], self.notify[provider]['secret'])
 
                 if notify:
                     # 发送消息
