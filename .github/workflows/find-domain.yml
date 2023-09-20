@@ -12,6 +12,8 @@ on:
   # schedule:
   #   - cron: "*/40 * * * *"
 
+env: ${{ secrets }}
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -34,3 +36,9 @@ jobs:
         env:
           YAML_URL: ${{ secrets.YAML_URL}}
         run: python run.py
+      
+      - uses: actions/upload-artifact@v3
+        if: true
+        with:
+          name: log-artifact
+          path: ${{ github.workspace }}/*domain.log

@@ -5,3 +5,6 @@
 *.txt
 
 config.dev.yml
+
+.venv
+venv
