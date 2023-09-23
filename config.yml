@@ -27,9 +27,9 @@ domain:
   # 起始域名（以此域名开始记录(含)，字符长度必须与 length 一致）
   start_char: ""
   # 组合前缀
-  prefix: ""
+  prefix: "xi"
   # 组合后缀
-  suffix: "co"
+  suffix: ""
 
 # Whois
 whois:
