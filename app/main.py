@@ -17,6 +17,7 @@ from .whois.west import West
 from .whois.qcloud import Qcloud
 from .whois.rapidapi import Rapidapi
 from .whois.zzidc import Zzidc
+import threading
 
 
 class App:
@@ -90,6 +91,8 @@ class App:
         # print("Domain:", self.domain)
         # print("Notify:", self.notify)
         # print("\n")
+
+        self.lock = threading.Lock()
 
     def config(self, file_path):
         '''
@@ -352,12 +355,24 @@ class App:
         '''
         抓取 whois 数据
         '''
+        pool = []  # 进程池
+        length = len(self.domains)
+        step = int(length / 26) + 1
+        for i in range(0, length, step):
+            p = threading.Thread(target=self.mutil_search, args=(self.domains[i: i + step],), name='LoopThread'+str(i))
+            pool.append(p)
+        for p in pool:
+            p.start()
+        for p in pool:
+            p.join()
+        
+    def mutil_search(self, domains):
         count = 0  # 成功查询次数
         max_retries = 3  # 最多重试3次
         if 'max_retries' in self.setting and isinstance(self.setting['max_retries'], int) and self.setting['max_retries'] >= 3:
             max_retries = self.setting['max_retries']
 
-        for domain in self.domains:
+        for domain in domains:
             # print(domain)
             retries = 0  # 重试次数计数器
             should_break = False  # 标志，用于控制是否跳出最外层的for循环
@@ -370,7 +385,7 @@ class App:
 
                     # 打印日志
                     dlog = f'{domain}, {1 if available else 0 }, {err}, {regdate}, {expdate}'
-                    print(dlog)
+                    print(threading.current_thread().name+" >>> "+dlog)
 
                     # whois 查询失败
                     if err != 0:
