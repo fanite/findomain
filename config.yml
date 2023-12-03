@@ -15,9 +15,9 @@ setting:
 # 域名
 domain:
   # 后缀
-  suffixes: com
+  suffixes: top
   # 长度
-  length: 4
+  length: 3
   # 组合模式
   # 1.纯数字，2.纯字母，3.纯数字+纯字母，4.数字与字母混合，5.自定义字符
   # 6.杂米（不含纯数字和字母），7.杂米，自定义字符
